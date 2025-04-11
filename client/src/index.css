@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Light theme (default) */
+  .light-theme, :root {
+    --background: linear-gradient(to bottom, #0A0E21, #1F2444);
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --text-primary: #2D3A6A;
+    --text-secondary: #6D5A9E;
+    --text-accent: #5A4A82;
+    --text-body: #4A5568;
+    --border-color: #E2E8F0;
+    --progress-indicator: #fff;
+    --background-accent: rgba(255, 255, 255, 0.15);
+    --background-accent-hover: rgba(255, 255, 255, 0.25);
+    --border-accent: rgba(255, 255, 255, 0.2);
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --icon-primary: #6D5A9E;
+    --icon-muted: #A0AEC0;
+    --icon-accent: #B2A4D4;
+    --bg-hover: rgba(247, 250, 252, 0.8);
+    --bg-subtle: #F7FAFC;
+    --border-primary: #D1D5DB;
+    --border-subtle: #E2E8F0;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+    /* Emotion colors */
+    --emotion-curious-bg: #EBF8FF;
+    --emotion-curious-text: #2B6CB0;
+    --emotion-afraid-bg: #FFF5F5;
+    --emotion-afraid-text: #C53030;
+    --emotion-confused-bg: #FFFFF0;
+    --emotion-confused-text: #975A16;
+    --emotion-peaceful-bg: #F0FFF4;
+    --emotion-peaceful-text: #2F855A;
+    --emotion-anxious-bg: #FFFAF0;
+    --emotion-anxious-text: #C05621;
+    --emotion-excited-bg: #FAF5FF;
+    --emotion-excited-text: #6B46C1;
+    --emotion-sad-bg: #F7FAFC;
+    --emotion-sad-text: #4A5568;
+    --emotion-other-bg: #F7FAFC;
+    --emotion-other-text: #4A5568;
+  }
+
+  /* Dark theme */
+  .dark-theme {
+    --background: linear-gradient(to bottom, #000000, #0F1A3D);
+    --card-bg: rgba(26, 32, 58, 0.95);
+    --text-primary: #A5B4FC;
+    --text-secondary: #BB9DEA;
+    --text-accent: #C4B5FD;
+    --text-body: #CBD5E0;
+    --border-color: #2D3748;
+    --progress-indicator: #8B5CF6;
+    --background-accent: rgba(90, 74, 130, 0.2);
+    --background-accent-hover: rgba(90, 74, 130, 0.3);
+    --border-accent: rgba(90, 74, 130, 0.4);
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --icon-primary: #BB9DEA;
+    --icon-muted: #64748B;
+    --icon-accent: #C4B5FD;
+    --bg-hover: rgba(45, 55, 72, 0.5);
+    --bg-subtle: #2D3748;
+    --border-primary: #4A5568;
+    --border-subtle: #2D3748;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    
+    /* Emotion colors - dark theme variants */
+    --emotion-curious-bg: rgba(43, 108, 176, 0.2);
+    --emotion-curious-text: #90CDF4;
+    --emotion-afraid-bg: rgba(197, 48, 48, 0.2);
+    --emotion-afraid-text: #FEB2B2;
+    --emotion-confused-bg: rgba(151, 90, 22, 0.2);
+    --emotion-confused-text: #FAF089;
+    --emotion-peaceful-bg: rgba(47, 133, 90, 0.2);
+    --emotion-peaceful-text: #9AE6B4;
+    --emotion-anxious-bg: rgba(192, 86, 33, 0.2);
+    --emotion-anxious-text: #FBD38D;
+    --emotion-excited-bg: rgba(107, 70, 193, 0.2);
+    --emotion-excited-text: #D6BCFA;
+    --emotion-sad-bg: rgba(74, 85, 104, 0.2);
+    --emotion-sad-text: #CBD5E0;
+    --emotion-other-bg: rgba(74, 85, 104, 0.2);
+    --emotion-other-text: #CBD5E0;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background: var(--background);
+    color: var(--text-body);
+  }
+
+  .bg-gradient-to-b {
+    background: var(--background);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+  }
+
+  /* Progress bar styles */
+  .progress-indicator {
+    background-color: var(--progress-indicator);
+  }
+
+  /* Card styling for both themes */
+  .bg-white\/90 {
+    background-color: var(--card-bg);
+  }
+
+  /* Text color overrides */
+  .text-\[\#2D3A6A\] {
+    color: var(--text-primary);
+  }
+
+  .text-\[\#6D5A9E\] {
+    color: var(--text-secondary);
+  }
+
+  /* Border color */
+  .border-gray-200 {
+    border-color: var(--border-color);
+  }
+
+  .text-gray-600, .text-gray-700 {
+    color: var(--text-body);
+  }
+}
