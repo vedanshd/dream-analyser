@@ -9,6 +9,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
+  // Base URL for GitHub Pages
+  base: process.env.NODE_ENV === 'production' && !process.env.VERCEL ? '/dream/' : '/',
   plugins: [
     react(),
     runtimeErrorOverlay(),
@@ -30,7 +32,15 @@ export default defineConfig({
   },
   root: path.resolve(__dirname, "client"),
   build: {
-    outDir: path.resolve(__dirname, "dist/public"),
+    // Set output directory relative to client directory (root)
+    outDir: "../client-build",
     emptyOutDir: true,
+    assetsDir: 'assets',
+    // Ensure GitHub Pages can properly serve the app
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
 });

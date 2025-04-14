@@ -3,12 +3,18 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
+  "homepage": "https://vedanshd.github.io/dream",
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build",
+    "build:server": "esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "vercel-build": "npm run build",
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "predeploy": "npm run build:client",
+    "deploy": "gh-pages -d client-build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -93,6 +99,7 @@
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.19.1",
     "esbuild": "^0.25.2",
+    "gh-pages": "^6.3.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "tsx": "^4.19.3",
