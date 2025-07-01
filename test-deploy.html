@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - DreamScape Works!</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #FFE4B5;
+        }
+        p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .success {
+            color: #90EE90;
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌟 DreamScape - AI Dream Analyzer 🌟</h1>
+        <p class="success">✅ GitHub Pages is working correctly!</p>
+        <p>Current time: <span id="time"></span></p>
+        <p>URL: <span id="url"></span></p>
+        <p>If you can see this page, the deployment infrastructure works.</p>
+        <p>The React app can now be properly deployed here.</p>
+    </div>
+    
+    <script>
+        document.getElementById('time').textContent = new Date().toLocaleString();
+        document.getElementById('url').textContent = window.location.href;
+        
+        // Test message
+        setTimeout(() => {
+            alert('GitHub Pages is working! The React app should work here too.');
+        }, 2000);
+    </script>
+</body>
+</html>
