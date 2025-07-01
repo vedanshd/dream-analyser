@@ -4,23 +4,6 @@ import { DreamInput } from "@shared/schema";
  * Mock dream analyzer for demonstration purposes when API keys are not available
  */
 export function mockAnalyzeDream(dreamInput: DreamInput) {
-  // Validate meaningful content
-  const validateInput = (text: string) => {
-    const words = text.trim().split(/\s+/);
-    const hasVowels = /[aeiou]/i.test(text);
-    const isGibberish = /^[a-z]{10,}$/i.test(text.replace(/\s/g, ''));
-    const hasRepeatingChars = /([a-z])\1{4,}/i.test(text);
-    
-    if (words.length < 2 || !hasVowels || isGibberish || hasRepeatingChars) {
-      throw new Error("The dream description appears to be unclear or contains nonsensical text. Please provide a meaningful description using real words that describe your actual dream experience.");
-    }
-  };
-  
-  // Validate the input
-  validateInput(dreamInput.dreamCues);
-  if (dreamInput.title) {
-    validateInput(dreamInput.title);
-  }
   
   // Process the dream input
   const theme = getThemeFromEmotion(dreamInput.primaryEmotion);

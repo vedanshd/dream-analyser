@@ -8,13 +8,21 @@ import { OpenAIClient } from "./openai";
 import { mockAnalyzeDream } from "./mock-dream-analyzer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Initialize OpenAI client
-  const openAI = new OpenAIClient(process.env.OPENAI_API_KEY || "");
+  // Debug environment loading
+  console.log('Environment check:', {
+    nodeEnv: process.env.NODE_ENV,
+    hasOpenAiKey: !!process.env.OPENAI_API_KEY,
+    keyPrefix: process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.substring(0, 10) + '...' : 'NOT_SET'
+  });
+  
+  // Initialize OpenAI client - use mock if no key
+  const openAI = process.env.OPENAI_API_KEY ? new OpenAIClient(process.env.OPENAI_API_KEY) : null;
 
   // API routes
   app.post("/api/dreams/analyze", async (req, res) => {
+    let dreamInput: DreamInput | undefined;
     try {
-      const dreamInput = dreamInputSchema.parse(req.body);
+      dreamInput = dreamInputSchema.parse(req.body);
       
       // Call OpenAI API to analyze the dream
       const dreamAnalysis = await analyzeDream(openAI, dreamInput);
@@ -42,10 +50,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      console.error("Error analyzing dream:", error);
+      console.error("Error analyzing dream:", {
+        error: error,
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+        dreamInput: {
+          titleLength: dreamInput?.title?.length || 0,
+          dreamCuesLength: dreamInput?.dreamCues?.length || 0,
+          emotion: dreamInput?.primaryEmotion || 'unknown'
+        }
+      });
+      
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      
       return res.status(500).json({
         message: "Failed to analyze dream",
-        error: error instanceof Error ? error.message : "Unknown error"
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : undefined) : undefined
       });
     }
   });
@@ -89,8 +110,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   return httpServer;
 }
 
-async function analyzeDream(openAI: OpenAIClient, dreamInput: DreamInput) {
+async function analyzeDream(openAI: OpenAIClient | null, dreamInput: DreamInput) {
   try {
+    // If no OpenAI client, use mock analyzer
+    if (!openAI) {
+      console.log('No OpenAI API key found, using mock analyzer');
+      return mockAnalyzeDream(dreamInput);
+    }
     
     // Add timeout wrapper for OpenAI API call
     const timeoutPromise = new Promise((_, reject) => {
