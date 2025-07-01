@@ -10,7 +10,7 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
   // Base URL for GitHub Pages (repository deployment) - only in production
-  base: process.env.NODE_ENV === 'production' ? '/dream-new/' : '/',
+  base: process.env.NODE_ENV === 'production' && process.env.GITHUB_PAGES ? '/dream-analyser/' : '/',
   plugins: [
     react(),
     runtimeErrorOverlay(),

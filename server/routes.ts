@@ -164,13 +164,11 @@ async function analyzeDream(openAI: OpenAIClient | null, dreamInput: DreamInput)
           Additional Emotional Context: ${dreamInput.additionalEmotions ?? "None provided"}`
         }
       ],
-      response_format: { type: "json_object" },
-      max_tokens: 1500,
-      temperature: 0.7
+      response_format: { type: "json_object" }
     });
     
     // Race between the API call and timeout
-    const response = await Promise.race([analysisPromise, timeoutPromise]);
+    const response = await Promise.race([analysisPromise, timeoutPromise]) as any;
 
     if (!response.choices?.[0]?.message?.content) {
       throw new Error("Invalid response from OpenAI API");
