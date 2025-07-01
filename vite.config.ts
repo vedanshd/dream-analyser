@@ -10,7 +10,7 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
   // Base URL for GitHub Pages (repository deployment)
-  base: '/dream/',
+  base: '/dream-new/',
   plugins: [
     react(),
     runtimeErrorOverlay(),

@@ -9,8 +9,8 @@ import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
 import { ThemeProvider } from "@/lib/theme-context";
 
-// GitHub Pages base path configuration - no base path for root deployment
-const basePath = "";
+// GitHub Pages base path configuration for dream-new repository
+const basePath = "/dream-new";
 
 function Router() {
   return (
