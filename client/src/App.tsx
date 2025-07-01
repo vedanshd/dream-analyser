@@ -10,7 +10,7 @@ import Contact from "@/pages/Contact";
 import { ThemeProvider } from "@/lib/theme-context";
 
 // GitHub Pages base path configuration for dream-new repository
-const basePath = import.meta.env.PROD ? "/dream-new" : "";
+const basePath = import.meta.env.PROD && window.location.hostname.includes("github.io") ? "/dream-analyser" : "";
 
 function Router() {
   return (
