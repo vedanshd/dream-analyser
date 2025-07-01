@@ -8,8 +8,7 @@ import {
   type DreamAnalysis 
 } from "@shared/schema";
 import { cn } from "@/lib/utils";
-import { apiRequest } from "@/lib/queryClient";
-import { queryClient } from "@/lib/queryClient";
+import { analyzeDreamClient } from "@/lib/openai-client";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Form, 
@@ -71,13 +70,11 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
   const analyzeDreamMutation = useMutation({
     mutationFn: async (data: DreamInput) => {
       setApiError(null); // Clear any previous errors
-      const response = await apiRequest("POST", "/api/dreams/analyze", data);
-      return response.json();
+      return await analyzeDreamClient(data);
     },
     onSuccess: (data) => {
       setAnalysisResult(data);
       setApiError(null);
-      queryClient.invalidateQueries({ queryKey: ['/api/dreams'] });
     },
     onError: (error) => {
       let errorMessage = "An unknown error occurred";
