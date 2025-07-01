@@ -9,8 +9,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
-  // Base URL for GitHub Pages
-  base: process.env.NODE_ENV === 'production' && !process.env.VERCEL ? '/dream/' : '/',
+  // Base URL for GitHub Pages (root deployment)
+  base: '/',
   plugins: [
     react(),
     runtimeErrorOverlay(),
