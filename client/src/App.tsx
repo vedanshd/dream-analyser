@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -8,6 +8,9 @@ import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
 import { ThemeProvider } from "@/lib/theme-context";
+
+// GitHub Pages base path configuration
+const basePath = import.meta.env.PROD ? "/dream" : "";
 
 function Router() {
   return (
@@ -25,7 +28,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <Router />
+        <WouterRouter base={basePath}>
+          <Router />
+        </WouterRouter>
         <Toaster />
       </ThemeProvider>
     </QueryClientProvider>
