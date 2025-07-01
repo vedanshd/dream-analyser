@@ -9,8 +9,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
-  // Base URL for GitHub Pages (root deployment)
-  base: '/',
+  // Base URL for GitHub Pages (repository deployment)
+  base: '/dream/',
   plugins: [
     react(),
     runtimeErrorOverlay(),
