@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        .button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">🌙 VDreamScape</h1>
+        <p class="subtitle">AI-Powered Dream Analysis Platform</p>
+        <p>This is a test page to verify GitHub Pages is working correctly.</p>
+        <button class="button" onclick="testFunction()">Test JavaScript</button>
+        <div id="status" class="status" style="display: none;">
+            ✅ JavaScript is working! GitHub Pages deployment successful.
+        </div>
+        <div style="margin-top: 30px;">
+            <p><strong>Features:</strong></p>
+            <ul style="text-align: left; display: inline-block;">
+                <li>🧠 AI-powered dream interpretation</li>
+                <li>🎨 Beautiful emotion selection interface</li>
+                <li>🌓 Light/dark theme support</li>
+                <li>📱 Fully responsive design</li>
+                <li>🛡️ Input validation and error handling</li>
+            </ul>
+        </div>
+        <div style="margin-top: 30px;">
+            <a href="./index.html" style="color: #fff; text-decoration: underline;">
+                → Go to Main Application
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function testFunction() {
+            document.getElementById('status').style.display = 'block';
+            console.log('JavaScript test successful!');
+        }
+        
+        // Test if main app assets are accessible
+        console.log('Testing asset accessibility...');
+        
+        // Check if CSS loads
+        const cssTest = new XMLHttpRequest();
+        cssTest.open('GET', './assets/index-CvLpCvWV.css', true);
+        cssTest.onreadystatechange = function() {
+            if (cssTest.readyState === 4) {
+                console.log('CSS asset status:', cssTest.status);
+            }
+        };
+        cssTest.send();
+        
+        // Check if JS loads
+        const jsTest = new XMLHttpRequest();
+        jsTest.open('GET', './assets/index-B0hUiBB2.js', true);
+        jsTest.onreadystatechange = function() {
+            if (jsTest.readyState === 4) {
+                console.log('JS asset status:', jsTest.status);
+            }
+        };
+        jsTest.send();
+    </script>
+</body>
+</html>
