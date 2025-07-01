@@ -91,8 +91,6 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
           if (jsonMatch) {
             const errorData = JSON.parse(jsonMatch[0]);
             errorMessage = errorData.message || errorMessage;
-          } else if (errorText.includes("nonsensical") || errorText.includes("meaningful")) {
-            errorMessage = errorText.split(": ").pop() || errorMessage;
           } else {
             errorMessage = errorText;
           }
@@ -103,14 +101,12 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
       
       setApiError(errorMessage);
       
-      // Also show toast for severe errors
-      if (!errorMessage.includes("nonsensical") && !errorMessage.includes("meaningful")) {
-        toast({
-          title: "Error analyzing dream",
-          description: errorMessage,
-          variant: "destructive",
-        });
-      }
+      // Show toast for all errors
+      toast({
+        title: "Error analyzing dream",
+        description: errorMessage,
+        variant: "destructive",
+      });
     },
   });
 

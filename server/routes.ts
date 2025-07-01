@@ -90,24 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 }
 
 async function analyzeDream(openAI: OpenAIClient, dreamInput: DreamInput) {
-  // Additional server-side validation for meaningful content
-  const validateInput = (text: string) => {
-    const words = text.trim().split(/\s+/);
-    const hasVowels = /[aeiou]/i.test(text);
-    const isGibberish = /^[a-z]{10,}$/i.test(text.replace(/\s/g, ''));
-    const hasRepeatingChars = /([a-z])\1{4,}/i.test(text);
-    
-    if (words.length < 2 || !hasVowels || isGibberish || hasRepeatingChars) {
-      throw new Error("The dream description appears to be unclear or contains nonsensical text. Please provide a meaningful description using real words that describe your actual dream experience.");
-    }
-  };
-  
   try {
-    // Validate the input before processing
-    validateInput(dreamInput.dreamCues);
-    if (dreamInput.title) {
-      validateInput(dreamInput.title);
-    }
     
     // Add timeout wrapper for OpenAI API call
     const timeoutPromise = new Promise((_, reject) => {
@@ -119,7 +102,6 @@ async function analyzeDream(openAI: OpenAIClient, dreamInput: DreamInput) {
         {
           role: "system",
           content: `You are an expert in dream interpretation and psychology. 
-          IMPORTANT: If the user's dream description appears to be random text, gibberish, or nonsensical, respond with an error message instead of attempting analysis.
           
           Analyze the user's dream fragments and emotional context to generate:
           1. A complete, vivid dream narrative (350-500 words) that incorporates all the dream cues provided

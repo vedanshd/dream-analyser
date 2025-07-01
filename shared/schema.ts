@@ -39,40 +39,12 @@ export const insertDreamSchema = createInsertSchema(dreams).omit({
 export type InsertDream = z.infer<typeof insertDreamSchema>;
 export type Dream = typeof dreams.$inferSelect;
 
-// Helper function to validate meaningful content
-const validateMeaningfulContent = (content: string) => {
-  // Check for random gibberish patterns
-  const hasConsecutiveChars = /([a-z])\1{3,}/i.test(content);
-  const hasRandomPattern = /^[a-z]{15,}$/i.test(content.replace(/\s/g, ''));
-  const wordCount = content.trim().split(/\s+/).length;
-  const hasVowels = /[aeiou]/i.test(content);
-  
-  // Must have at least 2 words and contain vowels
-  if (wordCount < 2 || !hasVowels) {
-    throw new Error("Please provide a meaningful description of your dream with real words.");
-  }
-  
-  // Check for obvious gibberish patterns
-  if (hasConsecutiveChars || hasRandomPattern) {
-    throw new Error("Your description appears to contain random characters. Please describe your dream using meaningful words.");
-  }
-  
-  return true;
-};
 
 export const dreamInputSchema = z.object({
-  title: z.string().optional().refine((val) => {
-    if (val && val.trim().length > 0) {
-      return validateMeaningfulContent(val);
-    }
-    return true;
-  }, { message: "Please provide a meaningful title using real words." }),
+  title: z.string().optional(),
   dreamCues: z.string()
-    .min(10, { message: "Please provide at least 10 characters about your dream" })
-    .max(2000, { message: "Dream description is too long. Please keep it under 2000 characters." })
-    .refine((val) => validateMeaningfulContent(val), {
-      message: "Please provide a meaningful description of your dream using real words and complete thoughts."
-    }),
+    .min(1, { message: "Please describe your dream" })
+    .max(2000, { message: "Dream description is too long. Please keep it under 2000 characters." }),
   isRecurring: z.boolean().default(false),
   primaryEmotion: z.string().min(1, { message: "Please select an emotion" }),
   wakeFeeling: z.number().min(1).max(5),
