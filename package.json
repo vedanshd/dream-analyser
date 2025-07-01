@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://vedanshd.github.io/dream-new",
+  "homepage": "https://vedanshd.github.io/dream-analyser",
   "scripts": {
     "dev": "tsx server/index.ts",
     "build": "npm run build:client && npm run build:server",
