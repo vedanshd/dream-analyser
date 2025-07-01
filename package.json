@@ -13,7 +13,7 @@
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc",
     "db:push": "drizzle-kit push",
-    "predeploy": "npm run build:client",
+    "predeploy": "GITHUB_PAGES=true npm run build:client",
     "deploy": "gh-pages -d client-build"
   },
   "dependencies": {
