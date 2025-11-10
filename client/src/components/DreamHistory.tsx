@@ -18,6 +18,7 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { getEmotionIcon } from "@/lib/emotions";
+import Trends from "./Trends";
 import { Dream } from "@shared/schema";
 
 interface DreamHistoryProps {
@@ -88,8 +89,10 @@ export default function DreamHistory({ showHistory, toggleHistory }: DreamHistor
             Hide
           </Button>
         </div>
-        
-        <Card className="bg-[var(--card-bg)] backdrop-blur-md rounded-xl shadow-[var(--card-shadow)] overflow-hidden">
+  {/* Trends visualizations (emotions, symbols, activity) */}
+  <Trends dreams={dreams} />
+
+  <Card className="bg-[var(--card-bg)] backdrop-blur-md rounded-xl shadow-[var(--card-shadow)] overflow-hidden">
           {isLoading && (
             <CardContent className="p-8 text-center">
               <p className="font-body text-[var(--text-body)]">Loading your dream history...</p>
@@ -174,6 +177,95 @@ export default function DreamHistory({ showHistory, toggleHistory }: DreamHistor
           </div>
           
           <DrawerFooter>
+            {/* Export / Print report for therapist */}
+            <Button
+              variant="ghost"
+              onClick={() => {
+                if (!selectedDream) return;
+                const win = window.open("", "_blank", "noopener,noreferrer");
+                if (!win) return;
+
+                const created = selectedDream.createdAt ? new Date(selectedDream.createdAt as any) : new Date();
+                const reportHtml = `
+                  <!doctype html>
+                  <html>
+                    <head>
+                      <meta charset="utf-8" />
+                      <title>Dream Report - ${selectedDream.title || 'Untitled'}</title>
+                      <meta name="viewport" content="width=device-width,initial-scale=1" />
+                      <style>
+                        body{font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:#111; padding:24px;}
+                        .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+                        h1{font-size:20px;margin:0 0 6px}
+                        .meta{color:#444;font-size:13px}
+                        .section{margin-top:18px}
+                        .section h3{margin:0 0 8px;font-size:15px}
+                        .prose p{margin:0 0 12px;line-height:1.5}
+                        table{width:100%;border-collapse:collapse;margin-top:8px}
+                        td,th{padding:6px;border:1px solid #ddd;text-align:left}
+                      </style>
+                    </head>
+                    <body>
+                      <div class="header">
+                        <div>
+                          <h1>${selectedDream.title ? selectedDream.title.replace(/</g,'&lt;') : 'Untitled Dream'}</h1>
+                          <div class="meta">Analyzed ${format(created, 'PPP p')}</div>
+                        </div>
+                        <div style="text-align:right">
+                          <div class="meta">Primary emotion: <strong>${(selectedDream.primaryEmotion || 'N/A')}</strong></div>
+                          <div class="meta">Wake feeling: <strong>${String(selectedDream.wakeFeeling || '')}</strong></div>
+                        </div>
+                      </div>
+
+                      <div class="section prose">
+                        <h3>Dream Narrative</h3>
+                        ${selectedDream.dreamNarrative ? (selectedDream.dreamNarrative.replace(/</g,'&lt;').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br/>')) : '<p><em>No narrative provided.</em></p>'}
+                      </div>
+
+                      ${selectedDream.psychologicalReport ? `
+                        <div class="section">
+                          <h3>Psychological Analysis</h3>
+                          <div class="prose">
+                            ${(selectedDream.psychologicalReport as any).analysisSummary ? ('<p>' + ((selectedDream.psychologicalReport as any).analysisSummary as string).replace(/</g,'&lt;').replace(/\n\n/g, '</p><p>') + '</p>') : ''}
+                          </div>
+                          ${(selectedDream.psychologicalReport as any).keySymbols ? (`
+                            <h4 style="margin-top:12px;">Key Symbols</h4>
+                            <table>
+                              <thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
+                              <tbody>
+                                ${(selectedDream.psychologicalReport as any).keySymbols.map((s: any) => (`<tr><td>${(s.symbol || '').replace(/</g,'&lt;')}</td><td>${(s.meaning || '').replace(/</g,'&lt;')}</td></tr>`)).join('')}
+                              </tbody>
+                            </table>
+                          `) : ''}
+                        </div>
+                      ` : ''}
+
+                      <!-- Reflection answers placeholder -->
+                      <div class="section">
+                        <h3>Reflection Notes</h3>
+                        <div class="prose">
+                          <p><em>If you have reflection notes for this dream, include them here before printing.</em></p>
+                        </div>
+                      </div>
+
+                      <script>
+                        window.onload = function(){
+                          setTimeout(function(){ window.print(); }, 200);
+                        };
+                      </script>
+                    </body>
+                  </html>
+                `;
+
+                win.document.open();
+                win.document.write(reportHtml);
+                win.document.close();
+              }}
+              className="mr-2"
+            >
+              Export / Print
+            </Button>
+
             <DrawerClose asChild>
               <Button variant="outline" className="text-[var(--text-primary)] border-[var(--border-primary)] hover:bg-[var(--bg-hover)]">Close</Button>
             </DrawerClose>

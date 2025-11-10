@@ -4,19 +4,19 @@ import { storage } from "./storage";
 import { dreamInputSchema, DreamInput } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { GeminiClient } from "./gemini";
+import { OpenAIClient } from "./openai";
 import { mockAnalyzeDream } from "./mock-dream-analyzer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Debug environment loading
   console.log('Environment check:', {
     nodeEnv: process.env.NODE_ENV,
-    hasGeminiKey: !!process.env.GEMINI_API_KEY,
-    keyPrefix: process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.substring(0, 10) + '...' : 'NOT_SET'
+    hasOpenAiKey: !!process.env.OPENAI_API_KEY,
+    keyPrefix: process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.substring(0, 10) + '...' : 'NOT_SET'
   });
   
-// Initialize Gemini client - use mock if no key
-  const gemini = process.env.GEMINI_API_KEY ? new GeminiClient(process.env.GEMINI_API_KEY) : null;
+  // Initialize OpenAI client - use mock if no key
+  const openAI = process.env.OPENAI_API_KEY ? new OpenAIClient(process.env.OPENAI_API_KEY) : null;
 
   // API routes
   app.post("/api/dreams/analyze", async (req, res) => {
@@ -24,8 +24,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       dreamInput = dreamInputSchema.parse(req.body);
       
-// Call Gemini API to analyze the dream
-      const dreamAnalysis = await analyzeDream(gemini, dreamInput);
+      // Call OpenAI API to analyze the dream
+      const dreamAnalysis = await analyzeDream(openAI, dreamInput);
       
       // Save dream with analysis
       const savedDream = await storage.createDream({
@@ -110,20 +110,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   return httpServer;
 }
 
-async function analyzeDream(gemini: GeminiClient | null, dreamInput: DreamInput) {
+async function analyzeDream(openAI: OpenAIClient | null, dreamInput: DreamInput) {
   try {
-    // If no Gemini client, use mock analyzer
-    if (!gemini) {
-      console.log('No Gemini API key found, using mock analyzer');
+    // If no OpenAI client, use mock analyzer
+    if (!openAI) {
+      console.log('No OpenAI API key found, using mock analyzer');
       return mockAnalyzeDream(dreamInput);
     }
     
-    // Add timeout wrapper for Gemini API call
+    // Add timeout wrapper for OpenAI API call
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error("Analysis timeout - please try again with a clearer dream description")), 30000); // 30 second timeout
     });
     
-    const analysisPromise = gemini.createChatCompletion({
+    const analysisPromise = openAI.createChatCompletion({
       messages: [
         {
           role: "system",
@@ -171,7 +171,7 @@ async function analyzeDream(gemini: GeminiClient | null, dreamInput: DreamInput)
     const response = await Promise.race([analysisPromise, timeoutPromise]) as any;
 
     if (!response.choices?.[0]?.message?.content) {
-      throw new Error("Invalid response from Gemini API");
+      throw new Error("Invalid response from OpenAI API");
     }
 
     const analysisContent = response.choices[0].message.content;
@@ -184,7 +184,7 @@ async function analyzeDream(gemini: GeminiClient | null, dreamInput: DreamInput)
     
     return parsed;
   } catch (error) {
-    console.log("Gemini API failed, using mock dream analyzer instead:", error instanceof Error ? error.message : "Unknown error");
+    console.log("OpenAI API failed, using mock dream analyzer instead:", error instanceof Error ? error.message : "Unknown error");
     
     // If it's a validation error, throw it instead of falling back
     if (error instanceof Error && error.message.includes("nonsensical")) {

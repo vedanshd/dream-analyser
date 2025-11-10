@@ -1,0 +1,64 @@
+VDreamScape - Part 1: High-Level Architecture & Main Flows
+
+What is VDreamScape?
+--------------------
+VDreamScape is a full-stack, AI-powered dream analysis platform.
+- Users input their dreams, emotions, and context.
+- AI analyzes the input, generates a narrative and psychological report.
+- Database stores dream analyses for later review.
+- UI is modern, responsive, and themeable.
+
+Main User Flow
+--------------
+1. User visits the app (served by Express backend, React frontend).
+2. User enters dream details via a multi-step form.
+3. On submit, frontend validates input, then sends it to the backend API.
+4. Backend validates again, then calls OpenAI (or a mock if no API key).
+5. AI returns analysis (narrative, symbols, questions).
+6. Backend saves analysis to the database, returns it to the frontend.
+7. Frontend displays results and offers to save/share.
+8. User can view dream history (fetched from backend).
+
+How the Main Components Interact
+-------------------------------
+Frontend:
+- App.tsx: Sets up global providers (theme, query client, toasts).
+- Home.tsx: Main page, orchestrates DreamAnalyzer and DreamHistory.
+- DreamAnalyzer.tsx: Multi-step form, handles user input, API calls, and result display.
+- DreamHistory.tsx: Fetches and displays saved dreams.
+
+Backend:
+- server/index.ts: Express app setup, middleware, error handling, static serving.
+- server/routes.ts: API endpoints for analyzing and fetching dreams.
+- server/openai.ts: Handles OpenAI API calls.
+- server/storage.ts: Database CRUD for dreams.
+
+Shared:
+- shared/schema.ts: TypeScript types and Zod schemas for validation and type safety across frontend and backend.
+
+How Data Flows (Bird’s Eye View)
+--------------------------------
+User -> ReactApp: Enter dream details
+ReactApp: Validate input (Zod/React Hook Form)
+ReactApp -> ExpressAPI: POST /api/dreams/analyze (dream data)
+ExpressAPI: Validate input (Zod)
+ExpressAPI -> OpenAI: (if API key) Analyze dream
+OpenAI -> ExpressAPI: Dream analysis result
+ExpressAPI -> Database: Save dream + analysis
+Database -> ExpressAPI: Saved dream (with ID)
+ExpressAPI -> ReactApp: Dream analysis + ID
+ReactApp -> User: Show results, allow save/share
+User -> ReactApp: View history
+ReactApp -> ExpressAPI: GET /api/dreams
+ExpressAPI -> Database: Fetch all dreams
+Database -> ExpressAPI: List of dreams
+ExpressAPI -> ReactApp: List of dreams
+ReactApp -> User: Show dream history
+
+Key Architectural Decisions
+--------------------------
+- Type safety everywhere: Shared types and validation (Zod) across stack.
+- Graceful fallback: If OpenAI is unavailable, use a mock analyzer.
+- Single-page app: All main logic in one page for simplicity.
+- Modern UI/UX: Animations, theme support, responsive design.
+

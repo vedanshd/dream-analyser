@@ -40,7 +40,7 @@ export default function Home() {
       />
       
       {/* Content */}
-      <Header />
+  <Header showHistory={showHistory} toggleHistory={toggleHistory} />
       
       <main className="relative z-10 container mx-auto px-4 pb-16">
         <DreamAnalyzer onSaveDream={handleSaveDream} />

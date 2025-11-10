@@ -15,7 +15,7 @@ A sophisticated dream analysis platform that leverages AI to transform personal 
 - TypeScript
 - React
 - Express
-- Google Gemini AI API (with fallback mock functionality)
+- OpenAI API (with fallback mock functionality)
 - TailwindCSS + ShadcnUI
 - React Query
 
@@ -39,7 +39,7 @@ A sophisticated dream analysis platform that leverages AI to transform personal 
    ```
 3. Create an .env file in the root directory and add your API keys (optional)
    ```
-   GEMINI_API_KEY=your_gemini_api_key
+   OPENAI_API_KEY=your_openai_key
    ```
 4. Start the development server
    ```bash
@@ -52,7 +52,7 @@ A sophisticated dream analysis platform that leverages AI to transform personal 
 For full AI functionality, add your API keys to the environment:
 
 ```
-GEMINI_API_KEY=your_gemini_api_key
+OPENAI_API_KEY=your_openai_key
 ```
 
 If no API key is provided, the application will use a mock dream analyzer that generates sample responses for demonstration purposes.

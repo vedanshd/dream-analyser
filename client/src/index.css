@@ -53,7 +53,8 @@
     --text-primary: #A5B4FC;
     --text-secondary: #BB9DEA;
     --text-accent: #C4B5FD;
-    --text-body: #CBD5E0;
+  /* Make body text pure white in dark mode for maximum contrast (improves analysis readability) */
+  --text-body: #ffffff;
     --border-color: #2D3748;
     --progress-indicator: #8B5CF6;
     --background-accent: rgba(90, 74, 130, 0.2);
@@ -87,6 +88,14 @@
     --emotion-sad-text: #CBD5E0;
     --emotion-other-bg: rgba(74, 85, 104, 0.2);
     --emotion-other-text: #CBD5E0;
+  }
+
+  /* Ensure Tailwind Typography (prose) colors are readable in dark mode.
+     Some generated/utility styles can be more specific, so we scope a rule
+     that forces prose content to white in dark-theme for maximum contrast. */
+  .dark-theme .prose,
+  .dark-theme .prose :where(p, li, h1, h2, h3, h4, h5, h6, blockquote, span) {
+    color: #ffffff !important;
   }
 
   * {
