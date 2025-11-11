@@ -305,7 +305,7 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
                 
                 <div className="flex flex-col md:flex-row gap-6 justify-center">
                   <motion.div 
-                    className="flex-1 p-6 border border-[var(--border-color)] rounded-xl bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group"
+                    className="flex-1 p-6 border border-[var(--border-color)] rounded-xl bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
@@ -317,12 +317,12 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
                     >
                       <QuillPen className="mx-auto h-8 w-8 text-purple-600 dark:text-purple-400 mb-3 group-hover:scale-110 transition-transform" />
                     </motion.div>
-                    <h3 className="font-heading font-medium text-lg mb-2 text-[var(--text-primary)]">Share Dream Fragments</h3>
-                    <p className="font-body text-sm text-[var(--text-body)]">Tell us what you remember from your dream, even small details matter.</p>
+                    <h3 className="font-heading font-medium text-lg mb-2 text-gray-900 dark:text-white">Share Dream Fragments</h3>
+                    <p className="font-body text-sm text-gray-700 dark:text-gray-300">Tell us what you remember from your dream, even small details matter.</p>
                   </motion.div>
                   
                   <motion.div 
-                    className="flex-1 p-6 border border-[var(--border-color)] rounded-xl bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group"
+                    className="flex-1 p-6 border border-[var(--border-color)] rounded-xl bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/30 dark:to-rose-950/30 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
@@ -334,12 +334,12 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
                     >
                       <FaceSmile className="mx-auto h-8 w-8 text-pink-600 dark:text-pink-400 mb-3 group-hover:scale-110 transition-transform" />
                     </motion.div>
-                    <h3 className="font-heading font-medium text-lg mb-2 text-[var(--text-primary)]">Record Your Emotions</h3>
-                    <p className="font-body text-sm text-[var(--text-body)]">How did you feel during and after the dream? Emotions provide valuable context.</p>
+                    <h3 className="font-heading font-medium text-lg mb-2 text-gray-900 dark:text-white">Record Your Emotions</h3>
+                    <p className="font-body text-sm text-gray-700 dark:text-gray-300">How did you feel during and after the dream? Emotions provide valuable context.</p>
                   </motion.div>
                   
                   <motion.div 
-                    className="flex-1 p-6 border border-[var(--border-color)] rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group"
+                    className="flex-1 p-6 border border-[var(--border-color)] rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
@@ -351,8 +351,8 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
                     >
                       <BookMarked className="mx-auto h-8 w-8 text-blue-600 dark:text-blue-400 mb-3 group-hover:scale-110 transition-transform" />
                     </motion.div>
-                    <h3 className="font-heading font-medium text-lg mb-2 text-[var(--text-primary)]">Receive Analysis</h3>
-                    <p className="font-body text-sm text-[var(--text-body)]">Get a complete dream narrative and psychological interpretation.</p>
+                    <h3 className="font-heading font-medium text-lg mb-2 text-gray-900 dark:text-white">Receive Analysis</h3>
+                    <p className="font-body text-sm text-gray-700 dark:text-gray-300">Get a complete dream narrative and psychological interpretation.</p>
                   </motion.div>
                 </div>
                 

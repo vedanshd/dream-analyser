@@ -7,14 +7,18 @@ import StarsBackground from "@/components/StarsBackground";
 import { DreamAnalysis } from "@shared/schema";
 import { motion } from "framer-motion";
 import { useTheme } from "@/lib/theme-context";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Home() {
   const [showHistory, setShowHistory] = useState(false);
   const { theme } = useTheme();
+  const queryClient = useQueryClient();
 
   const handleSaveDream = (dreamAnalysis: DreamAnalysis & { id: number }) => {
     // Dream is already saved by the backend during analysis
-    // Just show the history with a nice animation
+    // Invalidate the dreams query to refresh the history
+    queryClient.invalidateQueries({ queryKey: ['/api/dreams'] });
+    // Show the history with a nice animation
     setShowHistory(true);
   };
 

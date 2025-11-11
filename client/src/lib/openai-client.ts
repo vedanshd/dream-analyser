@@ -36,15 +36,30 @@ function mockAnalyzeDream(dreamInput: DreamInput): DreamAnalysis & { id: number 
 }
 
 export async function analyzeDreamClient(dreamInput: DreamInput): Promise<DreamAnalysis & { id: number }> {
-  // For GitHub Pages deployment, we'll use the mock analyzer
-  // In a real deployment with server support, you could make API calls here
   try {
-    // Simulate API delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    return mockAnalyzeDream(dreamInput);
+    // Call the server API endpoint to analyze and save the dream
+    const response = await fetch('/api/dreams/analyze', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dreamInput),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to analyze dream: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result;
   } catch (error) {
     console.error('Dream analysis error:', error);
-    throw new Error('Failed to analyze dream. Please try again.');
+    
+    // If the API call fails, fall back to mock analyzer
+    // This ensures the app still works even if the server is down
+    console.warn('Falling back to mock analyzer due to API error');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    return mockAnalyzeDream(dreamInput);
   }
 }
