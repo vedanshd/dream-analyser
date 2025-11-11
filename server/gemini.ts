@@ -22,9 +22,9 @@ export class GeminiClient {
     response_format?: { type: string };
   }): Promise<ChatResponse> {
     try {
-      // Get the Gemini Pro model
+      // Get the Gemini Pro model (using gemini-pro which is more widely available)
       const model = this.gemini.getGenerativeModel({ 
-        model: "gemini-1.5-pro",
+        model: "gemini-pro",
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 2000,
