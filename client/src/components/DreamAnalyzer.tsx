@@ -40,7 +40,9 @@ import {
   Share, 
   PenTool as QuillPen, 
   Smile as FaceSmile, 
-  BookMarked
+  BookMarked,
+  Mic,
+  MicOff
 } from "lucide-react";
 
 interface DreamAnalyzerProps {
@@ -52,6 +54,10 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
   const totalSteps = 4;
   const [analysisResult, setAnalysisResult] = useState<(DreamAnalysis & { id: number }) | null>(null);
   const { toast } = useToast();
+  
+  // Voice recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const [recognition, setRecognition] = useState<any>(null);
 
   const form = useForm<DreamInput>({
     resolver: zodResolver(dreamInputSchema),
@@ -116,6 +122,81 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
   const handlePreviousStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+    }
+  };
+
+  // Voice recording functions
+  const startVoiceRecording = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      toast({
+        title: "Voice recognition not supported",
+        description: "Your browser doesn't support voice input. Try Chrome or Edge.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognitionInstance = new SpeechRecognition();
+    
+    recognitionInstance.continuous = true;
+    recognitionInstance.interimResults = true;
+    recognitionInstance.lang = 'en-US';
+
+    let finalTranscript = '';
+
+    recognitionInstance.onstart = () => {
+      setIsRecording(true);
+      toast({
+        title: "🎤 Recording started",
+        description: "Speak your dream details...",
+      });
+    };
+
+    recognitionInstance.onresult = (event: any) => {
+      let interimTranscript = '';
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      // Update the form field with the transcript
+      const currentValue = form.getValues('dreamCues');
+      const newValue = currentValue ? currentValue + ' ' + finalTranscript + interimTranscript : finalTranscript + interimTranscript;
+      form.setValue('dreamCues', newValue.trim());
+    };
+
+    recognitionInstance.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsRecording(false);
+      toast({
+        title: "Recording error",
+        description: `Error: ${event.error}`,
+        variant: "destructive",
+      });
+    };
+
+    recognitionInstance.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognitionInstance.start();
+    setRecognition(recognitionInstance);
+  };
+
+  const stopVoiceRecording = () => {
+    if (recognition) {
+      recognition.stop();
+      setIsRecording(false);
+      toast({
+        title: "Recording stopped",
+        description: "Your voice input has been added to the dream details.",
+      });
     }
   };
 
@@ -263,14 +344,32 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
                       <FormItem>
                         <FormLabel className="font-heading font-medium text-gray-700">Dream fragments & details</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder="Describe what you remember: people, places, objects, actions, feelings, or any other details that stood out to you..." 
-                            className="w-full p-3 border border-gray-300 rounded-lg font-body focus:ring-2 focus:ring-[#6D5A9E]/50 focus:border-[#6D5A9E]"
-                            rows={6}
-                            {...field} 
-                          />
+                          <div className="relative">
+                            <Textarea 
+                              placeholder="Describe what you remember: people, places, objects, actions, feelings, or any other details that stood out to you..." 
+                              className="w-full p-3 pr-12 border border-gray-300 rounded-lg font-body focus:ring-2 focus:ring-[#6D5A9E]/50 focus:border-[#6D5A9E]"
+                              rows={6}
+                              {...field} 
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className={cn(
+                                "absolute right-2 top-2 rounded-full",
+                                isRecording && "bg-red-100 text-red-600 animate-pulse"
+                              )}
+                              onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
+                              title={isRecording ? "Stop recording" : "Start voice recording"}
+                            >
+                              {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                            </Button>
+                          </div>
                         </FormControl>
-                        <p className="mt-1 text-sm text-gray-500 font-body">Be as detailed as possible, but don't worry if your memory is fragmented.</p>
+                        <p className="mt-1 text-sm text-gray-500 font-body">
+                          Be as detailed as possible, but don't worry if your memory is fragmented. 
+                          {' '}<strong className="text-[var(--text-accent)]">Click the mic to use voice input!</strong>
+                        </p>
                         <FormMessage />
                       </FormItem>
                     )}

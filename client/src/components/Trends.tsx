@@ -17,6 +17,7 @@ import {
   Legend
 } from "recharts";
 import Timeline from "./Timeline";
+import StreakTracker from "./StreakTracker";
 
 interface TrendsProps {
   dreams: Dream[];
@@ -79,7 +80,13 @@ export default function Trends({ dreams }: TrendsProps) {
   if (!dreams || dreams.length === 0) return null;
 
   return (
-    <div className="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <>
+      {/* Streak tracker - full width above trends */}
+      <div className="mb-6">
+        <StreakTracker dreams={dreams} />
+      </div>
+
+      <div className="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div className="col-span-1 lg:col-span-1 bg-[var(--card-bg)] p-4 rounded-lg shadow-sm">
         <h4 className="font-heading text-sm font-medium mb-2 text-[var(--text-primary)]">Emotions</h4>
         <div style={{ width: "100%", height: 220 }}>
@@ -133,5 +140,6 @@ export default function Trends({ dreams }: TrendsProps) {
         <Timeline dreams={dreams} months={6} />
       </div>
     </div>
+    </>
   );
 }
