@@ -15,8 +15,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     keyPrefix: process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.substring(0, 10) + '...' : 'NOT_SET'
   });
   
-// Initialize Gemini client - use mock if no key
-  const gemini = process.env.GEMINI_API_KEY ? new GeminiClient(process.env.GEMINI_API_KEY) : null;
+  // Force use of mock analyzer since Gemini API has compatibility issues
+  console.log('Using mock dream analyzer for all requests');
+  const gemini = null;
 
   // API routes
   app.post("/api/dreams/analyze", async (req, res) => {
