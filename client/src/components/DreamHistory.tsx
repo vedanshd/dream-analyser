@@ -7,7 +7,7 @@ import {
   formatDistanceToNow, 
   format 
 } from "date-fns";
-import { Eye, History, EyeOff } from "lucide-react";
+import { Eye, History, EyeOff, Calendar, Filter } from "lucide-react";
 import { 
   Drawer,
   DrawerContent,
@@ -19,6 +19,9 @@ import {
 } from "@/components/ui/drawer";
 import { getEmotionIcon } from "@/lib/emotions";
 import { useToast } from "@/hooks/use-toast";
+import { filterDreamsByDate, getDreamsForDate, type DateFilterType, getAnniversaryDreams } from "@/lib/dateFilters";
+import { getMoonPhase, getMoonInsights } from "@/lib/moon";
+import DreamCalendar from "./DreamCalendar";
 
 // Component: ReflectionNotes — handles localStorage persistence for notes per dream
 function ReflectionNotes({ dreamId }: { dreamId: number }) {
@@ -84,12 +87,23 @@ export default function DreamHistory({ showHistory, toggleHistory }: DreamHistor
   const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [dateFilter, setDateFilter] = useState<DateFilterType>("all");
+  const [showCalendar, setShowCalendar] = useState(false);
   const { toast } = useToast();
 
-  const { data: dreams = [] as Dream[], isLoading } = useQuery<Dream[]>({
+  const { data: allDreams = [] as Dream[], isLoading } = useQuery<Dream[]>({
     queryKey: ['/api/dreams'],
     enabled: showHistory
   });
+
+  // Apply date filter
+  const dreams = filterDreamsByDate(allDreams, dateFilter);
+  
+  // Get anniversary dreams
+  const anniversaryDreams = getAnniversaryDreams(allDreams);
+  
+  // Get moon insights
+  const moonInsights = getMoonInsights(allDreams);
 
   const handleViewDream = (dream: Dream) => {
     setSelectedDream(dream);
@@ -126,6 +140,17 @@ export default function DreamHistory({ showHistory, toggleHistory }: DreamHistor
 
   if (!showHistory) return null;
 
+  const handleDateClick = (date: Date) => {
+    // When user clicks a date in calendar, filter to that specific date
+    setDateFilter('custom');
+    // Filter dreams to show only this date
+    const filtered = getDreamsForDate(allDreams, date);
+    toast({ 
+      title: `Dreams on ${format(date, 'PPP')}`, 
+      description: `Found ${filtered.length} dream${filtered.length !== 1 ? 's' : ''}` 
+    });
+  };
+
   return (
     <>
       <div className="mt-12 max-w-4xl mx-auto">
@@ -135,6 +160,16 @@ export default function DreamHistory({ showHistory, toggleHistory }: DreamHistor
             Your Dream History
           </h2>
           <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowCalendar(!showCalendar)}
+              className={`text-sm font-body flex items-center ${showCalendar ? 'text-[var(--text-accent)]' : 'text-[var(--text-secondary)]'}`}
+            >
+              <Calendar className="mr-1 h-4 w-4" />
+              {showCalendar ? 'Hide' : 'Show'} Calendar
+            </Button>
+
             <Button 
               variant="ghost"
               size="sm"
@@ -240,6 +275,85 @@ export default function DreamHistory({ showHistory, toggleHistory }: DreamHistor
             </Button>
           </div>
         </div>
+
+  {/* Date filter buttons */}
+  <div className="mb-6 flex flex-wrap gap-2 items-center">
+    <Filter className="h-4 w-4 text-[var(--icon-primary)]" />
+    <span className="text-sm text-[var(--text-secondary)] mr-2">Filter by:</span>
+    {[
+      { label: 'All', value: 'all' as DateFilterType },
+      { label: 'Today', value: 'today' as DateFilterType },
+      { label: 'This week', value: 'this-week' as DateFilterType },
+      { label: 'This month', value: 'this-month' as DateFilterType },
+      { label: 'Last 7 days', value: 'last-7-days' as DateFilterType },
+      { label: 'Last 30 days', value: 'last-30-days' as DateFilterType },
+      { label: 'This year', value: 'this-year' as DateFilterType },
+    ].map((filter) => (
+      <Button
+        key={filter.value}
+        variant={dateFilter === filter.value ? 'default' : 'outline'}
+        size="sm"
+        onClick={() => setDateFilter(filter.value)}
+        className="text-sm"
+      >
+        {filter.label}
+      </Button>
+    ))}
+  </div>
+
+  {/* Calendar view */}
+  {showCalendar && (
+    <div className="mb-6">
+      <DreamCalendar dreams={allDreams} onDateClick={handleDateClick} />
+    </div>
+  )}
+
+  {/* Moon insights */}
+  {moonInsights && (moonInsights.fullMoonDreams > 0 || moonInsights.newMoonDreams > 0) && (
+    <Card className="mb-6 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950 dark:to-purple-950 border-indigo-200 dark:border-indigo-800">
+      <CardContent className="p-6">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-2xl">🌙</span>
+          <h3 className="font-heading text-lg font-semibold text-[var(--text-primary)]">
+            Moon Phase Insights
+          </h3>
+        </div>
+        <div className="space-y-2 text-sm text-[var(--text-body)]">
+          <p>🌕 <strong>{moonInsights.fullMoonDreams}</strong> dream{moonInsights.fullMoonDreams !== 1 ? 's' : ''} during full moon</p>
+          <p>🌑 <strong>{moonInsights.newMoonDreams}</strong> dream{moonInsights.newMoonDreams !== 1 ? 's' : ''} during new moon</p>
+          <p>Most common phase: <strong>{moonInsights.mostCommonPhase}</strong></p>
+        </div>
+      </CardContent>
+    </Card>
+  )}
+
+  {/* Anniversary dreams notification */}
+  {anniversaryDreams.length > 0 && (
+    <Card className="mb-6 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 border-amber-200 dark:border-amber-800">
+      <CardContent className="p-6">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-2xl">🎂</span>
+          <h3 className="font-heading text-lg font-semibold text-[var(--text-primary)]">
+            Dream Anniversaries
+          </h3>
+        </div>
+        <p className="text-sm text-[var(--text-body)] mb-3">
+          You have <strong>{anniversaryDreams.length}</strong> dream{anniversaryDreams.length !== 1 ? 's' : ''} from this day in previous years:
+        </p>
+        <div className="space-y-2">
+          {anniversaryDreams.map((dream) => (
+            <div key={dream.id} className="text-sm text-[var(--text-body)] flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                {format(new Date(dream.createdAt), 'yyyy')}
+              </Badge>
+              <span className="truncate">{dream.title || 'Untitled Dream'}</span>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )}
+
   {/* Trends visualizations (emotions, symbols, activity) */}
   <Trends dreams={dreams} />
 
