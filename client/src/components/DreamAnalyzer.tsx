@@ -42,14 +42,13 @@ import {
   Smile as FaceSmile, 
   BookMarked,
   Mic,
-  MicOff
+  MicOff,
+  Download,
+  FileText
 } from "lucide-react";
+import { format } from "date-fns";
 
-interface DreamAnalyzerProps {
-  onSaveDream: (dreamAnalysis: DreamAnalysis & { id: number }) => void;
-}
-
-export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
+export default function DreamAnalyzer() {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
   const [analysisResult, setAnalysisResult] = useState<(DreamAnalysis & { id: number }) | null>(null);
@@ -218,34 +217,176 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
     setCurrentStep(1);
   };
 
-  const handleSaveAnalysis = () => {
-    if (analysisResult) {
-      onSaveDream(analysisResult);
-      toast({
-        title: "Dream saved",
-        description: "Your dream analysis has been saved to your history.",
-      });
-    }
-  };
+  const handleExportPDF = () => {
+    if (!analysisResult) return;
+    
+    const created = new Date();
+    
+    // Build psychological analysis HTML
+    const symbolsHtml = analysisResult.psychologicalReport?.keySymbols ? `
+      <div class="section">
+        <h3>Key Symbols</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${analysisResult.psychologicalReport.keySymbols.map((s: any) => 
+              `<tr>
+                <td>${(s.symbol || '').replace(/</g,'&lt;')}</td>
+                <td>${(s.meaning || '').replace(/</g,'&lt;')}</td>
+              </tr>`
+            ).join('')}
+          </tbody>
+        </table>
+      </div>
+    ` : '';
 
-  const handleShareAnalysis = () => {
-    if (navigator.share && analysisResult) {
-      navigator.share({
-        title: analysisResult.title,
-        text: `Check out my dream analysis: ${analysisResult.title}`,
-        url: window.location.href,
-      }).catch(() => {
-        toast({
-          title: "Sharing unavailable",
-          description: "Couldn't share this dream analysis.",
-        });
-      });
-    } else {
-      toast({
-        title: "Sharing unavailable",
-        description: "Web Share API is not supported in your browser.",
-      });
+    const analysisSummaryHtml = analysisResult.psychologicalReport?.analysisSummary ? `
+      <div class="section">
+        <h3>Analysis Summary</h3>
+        <div>${analysisResult.psychologicalReport.analysisSummary.replace(/</g,'&lt;').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>')}</div>
+      </div>
+    ` : '';
+
+    const reflectionQuestionsHtml = analysisResult.psychologicalReport?.reflectionQuestions ? `
+      <div class="section">
+        <h3>Reflection Questions</h3>
+        <ul>
+          ${analysisResult.psychologicalReport.reflectionQuestions.map((q: string) => 
+            `<li>${q.replace(/</g,'&lt;')}</li>`
+          ).join('')}
+        </ul>
+      </div>
+    ` : '';
+
+    const narrative = analysisResult.dreamNarrative ? 
+      analysisResult.dreamNarrative.replace(/</g,'&lt;').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>') : 
+      '<em>No narrative provided.</em>';
+
+    const htmlContent = `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dream Analysis Report</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #111;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
     }
+    h1 {
+      color: #6D5A9E;
+      border-bottom: 3px solid #6D5A9E;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    h2 {
+      color: #6D5A9E;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+    h3 {
+      color: #333;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    .metadata {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 30px;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+    .section {
+      margin-bottom: 25px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: #6D5A9E;
+      color: white;
+      font-weight: 600;
+    }
+    ul {
+      list-style-type: disc;
+      margin-left: 20px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    p {
+      margin-bottom: 12px;
+    }
+    @media print {
+      body {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Dream Analysis Report</h1>
+  
+  <div class="metadata">
+    <strong>Dream Title:</strong> ${(analysisResult.title || 'Untitled Dream').replace(/</g,'&lt;')}<br/>
+    <strong>Date:</strong> ${format(created, 'PPP p')}<br/>
+    <strong>Analysis ID:</strong> #${analysisResult.id}
+  </div>
+
+  <div class="section">
+    <h2>Dream Narrative</h2>
+    <p>${narrative}</p>
+  </div>
+
+  <h2>Psychological Analysis</h2>
+  ${symbolsHtml}
+  ${analysisSummaryHtml}
+  ${reflectionQuestionsHtml}
+
+  <div style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #999; font-size: 12px;">
+    <p>Generated by VDreamScape - Dream Analysis Platform</p>
+  </div>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'noopener,noreferrer');
+    if (!win) {
+      toast({ 
+        title: 'Unable to open window', 
+        description: 'Please allow popups for this site.' 
+      });
+      return;
+    }
+    win.document.open();
+    win.document.write(htmlContent);
+    win.document.close();
+    
+    // Trigger print dialog for PDF export
+    setTimeout(() => {
+      win.print();
+    }, 250);
+    
+    toast({
+      title: "Report Ready",
+      description: "Your dream analysis report is ready to print or save as PDF.",
+    });
   };
 
   return (
@@ -903,35 +1044,19 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
                         </Button>
                       </motion.div>
                       
-                      <div className="flex gap-3">
-                        <motion.div
-                          whileHover={{ scale: 1.05, y: -2 }}
-                          whileTap={{ scale: 0.95 }}
+                      <motion.div
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Button 
+                          type="button"
+                          onClick={handleExportPDF}
+                          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-heading font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
                         >
-                          <Button 
-                            type="button"
-                            onClick={handleSaveAnalysis}
-                            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-heading font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
-                          >
-                            <Save className="mr-2 h-4 w-4" />
-                            Save Dream
-                          </Button>
-                        </motion.div>
-                        
-                        <motion.div
-                          whileHover={{ scale: 1.05, y: -2 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <Button 
-                            type="button"
-                            onClick={handleShareAnalysis}
-                            className="px-6 py-3 bg-gradient-to-r from-[var(--text-secondary)] to-[var(--text-accent)] hover:from-[var(--text-accent)] hover:to-purple-700 text-white font-heading font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
-                          >
-                            <Share className="mr-2 h-4 w-4" />
-                            Share
-                          </Button>
-                        </motion.div>
-                      </div>
+                          <Download className="mr-2 h-4 w-4" />
+                          Export as PDF
+                        </Button>
+                      </motion.div>
                     </div>
                   </motion.div>
                 )}

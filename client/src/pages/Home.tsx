@@ -1,30 +1,12 @@
-import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DreamAnalyzer from "@/components/DreamAnalyzer";
-import DreamHistory from "@/components/DreamHistory";
 import StarsBackground from "@/components/StarsBackground";
-import { DreamAnalysis } from "@shared/schema";
 import { motion } from "framer-motion";
 import { useTheme } from "@/lib/theme-context";
-import { useQueryClient } from "@tanstack/react-query";
 
 export default function Home() {
-  const [showHistory, setShowHistory] = useState(false);
   const { theme } = useTheme();
-  const queryClient = useQueryClient();
-
-  const handleSaveDream = (dreamAnalysis: DreamAnalysis & { id: number }) => {
-    // Dream is already saved by the backend during analysis
-    // Invalidate the dreams query to refresh the history
-    queryClient.invalidateQueries({ queryKey: ['/api/dreams'] });
-    // Show the history with a nice animation
-    setShowHistory(true);
-  };
-
-  const toggleHistory = () => {
-    setShowHistory(!showHistory);
-  };
 
   return (
     <div className="relative min-h-screen overflow-hidden font-sans">
@@ -70,11 +52,10 @@ export default function Home() {
       />
       
       {/* Content */}
-  <Header showHistory={showHistory} toggleHistory={toggleHistory} />
+      <Header />
       
       <main className="relative z-10 container mx-auto px-4 pb-16">
-        <DreamAnalyzer onSaveDream={handleSaveDream} />
-        <DreamHistory showHistory={showHistory} toggleHistory={toggleHistory} />
+        <DreamAnalyzer />
       </main>
       
       <Footer />
