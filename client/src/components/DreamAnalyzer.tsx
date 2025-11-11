@@ -249,10 +249,23 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
   };
 
   return (
-    <div className="dream-card rounded-xl shadow-[0_10px_25px_-5px_rgba(109,90,158,0.2),0_10px_10px_-5px_rgba(109,90,158,0.1)] hover:shadow-[0_15px_30px_-5px_rgba(109,90,158,0.25),0_10px_15px_-5px_rgba(109,90,158,0.15)] transition-all duration-300 max-w-4xl mx-auto overflow-hidden bg-card backdrop-blur-md border border-[var(--border-color)]">
+    <motion.div 
+      className="dream-card rounded-2xl shadow-[0_10px_25px_-5px_rgba(109,90,158,0.2),0_10px_10px_-5px_rgba(109,90,158,0.1)] hover:shadow-[0_20px_40px_-5px_rgba(109,90,158,0.3),0_10px_20px_-5px_rgba(109,90,158,0.2)] transition-all duration-500 max-w-4xl mx-auto overflow-hidden bg-card backdrop-blur-md border border-[var(--border-color)] relative"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Animated gradient border effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-indigo-500/10 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
+      
       {/* Progress Bar */}
-      <div className="bg-gradient-to-r from-[var(--text-primary)] to-[var(--text-secondary)] p-1">
-        <Progress value={(currentStep / totalSteps) * 100} className="h-2 rounded-sm bg-black/10 progress-indicator" />
+      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 p-1 relative overflow-hidden">
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          animate={{ x: ['-100%', '200%'] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        />
+        <Progress value={(currentStep / totalSteps) * 100} className="h-2 rounded-sm bg-black/10 progress-indicator relative z-10" />
       </div>
       
       {/* Step Content Container */}
@@ -269,42 +282,94 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
             {/* Step 1: Introduction */}
             {currentStep === 1 && (
               <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-[var(--heading-color)] mb-3">Welcome to VDreamScape</h2>
-                  <p className="font-body text-gray-600 max-w-2xl mx-auto">
+                <motion.div 
+                  className="text-center mb-8"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <motion.div
+                    animate={{ rotate: [0, 5, -5, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="inline-block mb-4"
+                  >
+                    <Sparkles className="h-12 w-12 text-[var(--text-accent)] mx-auto" />
+                  </motion.div>
+                  <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-[var(--heading-color)] mb-3">
+                    Welcome to VDreamScape ✨
+                  </h2>
+                  <p className="font-body text-[var(--text-body)] max-w-2xl mx-auto">
                     Unlock the mysteries of your dreams through advanced dream analysis. Share fragments of what you remember, and we'll help you understand their deeper meaning.
                   </p>
-                </div>
+                </motion.div>
                 
                 <div className="flex flex-col md:flex-row gap-6 justify-center">
-                  <div className="flex-1 p-5 border border-[var(--border-color)] rounded-lg bg-card text-center">
-                    <QuillPen className="mx-auto h-6 w-6 text-[var(--text-secondary)] mb-2" />
-                    <h3 className="font-heading font-medium text-lg mb-2">Share Dream Fragments</h3>
-                    <p className="font-body text-sm">Tell us what you remember from your dream, even small details matter.</p>
-                  </div>
+                  <motion.div 
+                    className="flex-1 p-6 border border-[var(--border-color)] rounded-xl bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    whileHover={{ y: -5 }}
+                  >
+                    <motion.div
+                      animate={{ y: [0, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <QuillPen className="mx-auto h-8 w-8 text-purple-600 dark:text-purple-400 mb-3 group-hover:scale-110 transition-transform" />
+                    </motion.div>
+                    <h3 className="font-heading font-medium text-lg mb-2 text-[var(--text-primary)]">Share Dream Fragments</h3>
+                    <p className="font-body text-sm text-[var(--text-body)]">Tell us what you remember from your dream, even small details matter.</p>
+                  </motion.div>
                   
-                  <div className="flex-1 p-5 border border-[var(--border-color)] rounded-lg bg-card text-center">
-                    <FaceSmile className="mx-auto h-6 w-6 text-[var(--text-secondary)] mb-2" />
-                    <h3 className="font-heading font-medium text-lg mb-2">Record Your Emotions</h3>
-                    <p className="font-body text-sm">How did you feel during and after the dream? Emotions provide valuable context.</p>
-                  </div>
+                  <motion.div 
+                    className="flex-1 p-6 border border-[var(--border-color)] rounded-xl bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    whileHover={{ y: -5 }}
+                  >
+                    <motion.div
+                      animate={{ y: [0, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                    >
+                      <FaceSmile className="mx-auto h-8 w-8 text-pink-600 dark:text-pink-400 mb-3 group-hover:scale-110 transition-transform" />
+                    </motion.div>
+                    <h3 className="font-heading font-medium text-lg mb-2 text-[var(--text-primary)]">Record Your Emotions</h3>
+                    <p className="font-body text-sm text-[var(--text-body)]">How did you feel during and after the dream? Emotions provide valuable context.</p>
+                  </motion.div>
                   
-                  <div className="flex-1 p-5 border border-[var(--border-color)] rounded-lg bg-card text-center">
-                    <BookMarked className="mx-auto h-6 w-6 text-[var(--text-secondary)] mb-2" />
-                    <h3 className="font-heading font-medium text-lg mb-2">Receive Analysis</h3>
-                    <p className="font-body text-sm">Get a complete dream narrative and psychological interpretation.</p>
-                  </div>
+                  <motion.div 
+                    className="flex-1 p-6 border border-[var(--border-color)] rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    whileHover={{ y: -5 }}
+                  >
+                    <motion.div
+                      animate={{ y: [0, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+                    >
+                      <BookMarked className="mx-auto h-8 w-8 text-blue-600 dark:text-blue-400 mb-3 group-hover:scale-110 transition-transform" />
+                    </motion.div>
+                    <h3 className="font-heading font-medium text-lg mb-2 text-[var(--text-primary)]">Receive Analysis</h3>
+                    <p className="font-body text-sm text-[var(--text-body)]">Get a complete dream narrative and psychological interpretation.</p>
+                  </motion.div>
                 </div>
                 
-                <div className="flex justify-center mt-8">
+                <motion.div 
+                  className="flex justify-center mt-8"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                >
                   <Button 
                     onClick={handleNextStep}
-                    className="px-8 py-6 bg-[var(--text-secondary)] hover:bg-[var(--text-accent)] text-white font-heading font-medium rounded-full transition-colors duration-300"
+                    className="px-8 py-6 bg-gradient-to-r from-[var(--text-secondary)] to-[var(--text-accent)] hover:from-[var(--text-accent)] hover:to-[var(--text-secondary)] text-white font-heading font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
                   >
-                    Begin Analysis
+                    Begin Analysis ✨
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
-                </div>
+                </motion.div>
               </div>
             )}
             
@@ -433,12 +498,24 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
             {/* Step 3: Emotions */}
             {currentStep === 3 && (
               <div className="space-y-6">
-                <div className="text-center mb-6">
-                  <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-[var(--heading-color)] mb-3">How Did You Feel?</h2>
-                  <p className="font-body text-gray-600 max-w-2xl mx-auto">
+                <motion.div 
+                  className="text-center mb-6"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <motion.div
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="inline-block mb-4"
+                  >
+                    <FaceSmile className="h-12 w-12 text-pink-500 mx-auto" />
+                  </motion.div>
+                  <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-[var(--heading-color)] mb-3">How Did You Feel? 💭</h2>
+                  <p className="font-body text-[var(--text-body)] max-w-2xl mx-auto">
                     Select the emotions you felt during the dream and upon waking up. This helps us understand the emotional context.
                   </p>
-                </div>
+                </motion.div>
                 
                 <div className="space-y-6">
                   <FormField
@@ -446,40 +523,62 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
                     name="primaryEmotion"
                     render={({ field }) => (
                       <FormItem className="space-y-3">
-                        <FormLabel className="block font-heading font-medium text-gray-700">Primary emotion during the dream</FormLabel>
+                        <FormLabel className="block font-heading font-medium text-[var(--text-primary)]">Primary emotion during the dream</FormLabel>
                         <FormControl>
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                            {allEmotions.map((emotion) => {
+                            {allEmotions.map((emotion, index) => {
                               const EmotionIcon = getEmotionIcon(emotion.value);
+                              const isSelected = field.value === emotion.value;
                               return (
-                                <div key={emotion.value} className="relative">
+                                <motion.div 
+                                  key={emotion.value} 
+                                  className="relative"
+                                  initial={{ opacity: 0, scale: 0.8 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: index * 0.05 }}
+                                  whileHover={{ scale: 1.05, y: -2 }}
+                                  whileTap={{ scale: 0.95 }}
+                                >
                                   <input 
                                     type="radio"
                                     id={`emotion-${emotion.value}`}
                                     value={emotion.value}
-                                    checked={field.value === emotion.value}
+                                    checked={isSelected}
                                     onChange={() => field.onChange(emotion.value)}
                                     className="peer sr-only"
                                   />
                                   <label 
                                     htmlFor={`emotion-${emotion.value}`} 
                                     className={cn(
-                                      "flex flex-col items-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200",
-                                      field.value === emotion.value 
-                                        ? "border-[var(--primary-accent)] bg-[var(--primary-accent)] text-white shadow-lg transform scale-105" 
-                                        : "border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                                      "flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden",
+                                      isSelected
+                                        ? "border-[var(--primary-accent)] bg-gradient-to-br from-[var(--primary-accent)] to-purple-600 text-white shadow-lg" 
+                                        : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600"
                                     )}
                                   >
-                                    <EmotionIcon className={cn(
-                                      "h-6 w-6 mb-2",
-                                      field.value === emotion.value ? "text-white" : "text-[var(--text-secondary)]"
-                                    )} />
+                                    {isSelected && (
+                                      <motion.div
+                                        className="absolute inset-0 bg-white/20"
+                                        initial={{ scale: 0, opacity: 0 }}
+                                        animate={{ scale: 2, opacity: 0 }}
+                                        transition={{ duration: 0.6 }}
+                                      />
+                                    )}
+                                    <motion.div
+                                      animate={isSelected ? { rotate: [0, -10, 10, 0], y: [0, -5, 0] } : {}}
+                                      transition={{ duration: 0.5 }}
+                                    >
+                                      <EmotionIcon className={cn(
+                                        "h-7 w-7 mb-2",
+                                        isSelected ? "text-white" : "text-[var(--text-secondary)]"
+                                      )} />
+                                    </motion.div>
                                     <span className={cn(
                                       "font-body text-center text-sm",
-                                      field.value === emotion.value ? "text-white font-medium" : "text-[var(--text-body)]"
+                                      isSelected ? "text-white font-semibold" : "text-[var(--text-body)]"
                                     )}>{emotion.label}</span>
                                   </label>
-                                </div>
+                                </motion.div>
                               );
                             })}
                           </div>
@@ -494,20 +593,54 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
                     name="wakeFeeling"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="block font-heading font-medium text-gray-700">How did you feel upon waking?</FormLabel>
-                        <div className="flex items-center space-x-3 my-3">
-                          <span className="text-sm font-body text-gray-500">Unsettled</span>
-                          <FormControl>
-                            <Slider
-                              min={1}
-                              max={5}
-                              step={1}
-                              value={[field.value]}
-                              onValueChange={(values) => field.onChange(values[0])}
-                              className="w-full h-2 bg-gray-200 rounded-lg accent-[#6D5A9E]"
-                            />
-                          </FormControl>
-                          <span className="text-sm font-body text-gray-500">Refreshed</span>
+                        <FormLabel className="block font-heading font-medium text-[var(--text-primary)]">How did you feel upon waking?</FormLabel>
+                        <div className="bg-gradient-to-r from-red-50 via-yellow-50 to-green-50 dark:from-red-950/30 dark:via-yellow-950/30 dark:to-green-950/30 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center justify-between mb-4">
+                            <motion.span 
+                              className="text-2xl"
+                              animate={{ rotate: field.value <= 2 ? [-5, 5, -5] : 0 }}
+                              transition={{ duration: 1, repeat: field.value <= 2 ? Infinity : 0 }}
+                            >
+                              😰
+                            </motion.span>
+                            <motion.span 
+                              className="text-2xl"
+                              animate={{ rotate: field.value === 3 ? [-5, 5, -5] : 0 }}
+                              transition={{ duration: 1, repeat: field.value === 3 ? Infinity : 0 }}
+                            >
+                              😐
+                            </motion.span>
+                            <motion.span 
+                              className="text-2xl"
+                              animate={{ rotate: field.value >= 4 ? [-5, 5, -5] : 0, y: field.value >= 4 ? [0, -5, 0] : 0 }}
+                              transition={{ duration: 1, repeat: field.value >= 4 ? Infinity : 0 }}
+                            >
+                              😊
+                            </motion.span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <span className="text-sm font-body text-gray-600 dark:text-gray-400 min-w-fit">Unsettled</span>
+                            <FormControl>
+                              <Slider
+                                min={1}
+                                max={5}
+                                step={1}
+                                value={[field.value]}
+                                onValueChange={(values) => field.onChange(values[0])}
+                                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg"
+                              />
+                            </FormControl>
+                            <span className="text-sm font-body text-gray-600 dark:text-gray-400 min-w-fit">Refreshed</span>
+                          </div>
+                          <div className="text-center mt-3">
+                            <span className="text-lg font-semibold text-[var(--text-primary)]">
+                              {field.value === 1 && "Very Unsettled"}
+                              {field.value === 2 && "Somewhat Unsettled"}
+                              {field.value === 3 && "Neutral"}
+                              {field.value === 4 && "Somewhat Refreshed"}
+                              {field.value === 5 && "Very Refreshed"}
+                            </span>
+                          </div>
                         </div>
                         <FormMessage />
                       </FormItem>
@@ -584,21 +717,75 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
                 {/* Loading State */}
                 {analyzeDreamMutation.isPending && (
                   <div className="py-10">
-                    <div className="text-center mb-8">
-                      <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-[var(--heading-color)] mb-3">Interpreting Your Dream</h2>
-                      <p className="font-body text-gray-600 max-w-2xl mx-auto">
+                    <motion.div 
+                      className="text-center mb-8"
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-[var(--heading-color)] mb-3">Interpreting Your Dream ✨</h2>
+                      <p className="font-body text-[var(--text-body)] max-w-2xl mx-auto">
                         We're analyzing your dream fragments and emotions to create a complete narrative and psychological interpretation.
                       </p>
-                    </div>
+                    </motion.div>
                     
                     <div className="flex flex-col items-center justify-center">
-                      <div className="relative w-24 h-24">
-                        <div className="absolute inset-0 rounded-full border-4 border-[#B2A4D4]/30 border-dashed animate-spin"></div>
-                        <div className="absolute inset-2 flex items-center justify-center">
-                          <Sparkles className="h-8 w-8 text-[var(--icon-primary)] animate-pulse" />
+                      <div className="relative w-32 h-32">
+                        {/* Outer spinning ring */}
+                        <motion.div 
+                          className="absolute inset-0 rounded-full border-4 border-purple-300/40 dark:border-purple-700/40 border-t-purple-600 dark:border-t-purple-400"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        />
+                        {/* Middle spinning ring */}
+                        <motion.div 
+                          className="absolute inset-3 rounded-full border-4 border-pink-300/40 dark:border-pink-700/40 border-b-pink-600 dark:border-b-pink-400"
+                          animate={{ rotate: -360 }}
+                          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                        />
+                        {/* Inner pulsing sparkle */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <motion.div
+                            animate={{ 
+                              scale: [1, 1.2, 1],
+                              rotate: [0, 180, 360]
+                            }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                          >
+                            <Sparkles className="h-10 w-10 text-[var(--text-accent)]" />
+                          </motion.div>
                         </div>
                       </div>
-                      <p className="font-body text-gray-500 mt-4">This may take a moment...</p>
+                      
+                      {/* Floating emoji particles */}
+                      <div className="relative mt-8 w-full h-16">
+                        {['✨', '💭', '🌙', '⭐', '💫'].map((emoji, i) => (
+                          <motion.span
+                            key={i}
+                            className="absolute text-2xl"
+                            style={{ left: `${20 + i * 15}%` }}
+                            animate={{
+                              y: [-20, -60, -20],
+                              opacity: [0, 1, 0],
+                            }}
+                            transition={{
+                              duration: 3,
+                              repeat: Infinity,
+                              delay: i * 0.4,
+                              ease: "easeInOut"
+                            }}
+                          >
+                            {emoji}
+                          </motion.span>
+                        ))}
+                      </div>
+                      
+                      <motion.p 
+                        className="font-body text-[var(--text-body)] mt-4"
+                        animate={{ opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        This may take a moment...
+                      </motion.p>
                     </div>
                   </div>
                 )}
@@ -694,35 +881,56 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
                     </div>
                     
                     {/* Actions */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-between pt-4">
-                      <Button 
-                        type="button"
-                        variant="outline"
-                        onClick={startNewAnalysis}
-                        className="px-5 py-2.5 border border-[var(--border-color)] hover:bg-[var(--button-hover-bg)] font-heading font-medium rounded-full transition-colors duration-300"
+                    <div className="flex flex-col sm:flex-row gap-4 justify-between pt-6">
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                       >
-                        <RefreshCw className="mr-2 h-4 w-4 text-[var(--icon-primary)]" />
-                        New Analysis
-                      </Button>
+                        <Button 
+                          type="button"
+                          variant="outline"
+                          onClick={startNewAnalysis}
+                          className="w-full sm:w-auto px-6 py-3 border-2 border-[var(--border-color)] hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 dark:hover:from-purple-950/30 dark:hover:to-indigo-950/30 font-heading font-medium rounded-full transition-all duration-300 shadow-md hover:shadow-lg"
+                        >
+                          <motion.div
+                            animate={{ rotate: [0, 360] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            className="inline-block mr-2"
+                          >
+                            <RefreshCw className="h-4 w-4 text-[var(--icon-primary)]" />
+                          </motion.div>
+                          New Analysis
+                        </Button>
+                      </motion.div>
                       
                       <div className="flex gap-3">
-                        <Button 
-                          type="button"
-                          onClick={handleSaveAnalysis}
-                          className="px-5 py-2.5 bg-[var(--button-secondary)] hover:bg-[var(--button-secondary-hover)] text-white font-heading font-medium rounded-full transition-colors duration-300"
+                        <motion.div
+                          whileHover={{ scale: 1.05, y: -2 }}
+                          whileTap={{ scale: 0.95 }}
                         >
-                          <Save className="mr-2 h-4 w-4" />
-                          Save
-                        </Button>
+                          <Button 
+                            type="button"
+                            onClick={handleSaveAnalysis}
+                            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-heading font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
+                          >
+                            <Save className="mr-2 h-4 w-4" />
+                            Save Dream
+                          </Button>
+                        </motion.div>
                         
-                        <Button 
-                          type="button"
-                          onClick={handleShareAnalysis}
-                          className="px-5 py-2.5 bg-[var(--text-secondary)] hover:bg-[var(--text-accent)] text-white font-heading font-medium rounded-full transition-colors duration-300"
+                        <motion.div
+                          whileHover={{ scale: 1.05, y: -2 }}
+                          whileTap={{ scale: 0.95 }}
                         >
-                          <Share className="mr-2 h-4 w-4" />
-                          Share
-                        </Button>
+                          <Button 
+                            type="button"
+                            onClick={handleShareAnalysis}
+                            className="px-6 py-3 bg-gradient-to-r from-[var(--text-secondary)] to-[var(--text-accent)] hover:from-[var(--text-accent)] hover:to-purple-700 text-white font-heading font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
+                          >
+                            <Share className="mr-2 h-4 w-4" />
+                            Share
+                          </Button>
+                        </motion.div>
                       </div>
                     </div>
                   </motion.div>
@@ -732,6 +940,6 @@ export default function DreamAnalyzer({ onSaveDream }: DreamAnalyzerProps) {
           </motion.div>
         </AnimatePresence>
       </Form>
-    </div>
+    </motion.div>
   );
 }
