@@ -15,9 +15,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     keyPrefix: process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.substring(0, 10) + '...' : 'NOT_SET'
   });
   
-  // Force use of mock analyzer since Gemini API has compatibility issues
-  console.log('Using mock dream analyzer for all requests');
-  const gemini = null;
+  // Initialize Gemini API client if API key is available
+  const gemini = process.env.GEMINI_API_KEY ? new GeminiClient(process.env.GEMINI_API_KEY) : null;
+  
+  if (!gemini) {
+    console.log('No Gemini API key found, using mock analyzer');
+  }
 
   // API routes
   app.post("/api/dreams/analyze", async (req, res) => {
@@ -121,8 +124,10 @@ async function analyzeDream(gemini: GeminiClient | null, dreamInput: DreamInput)
     
     // Add timeout wrapper for Gemini API call
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error("Analysis timeout - please try again with a clearer dream description")), 30000); // 30 second timeout
+      setTimeout(() => reject(new Error("Analysis timeout - please try again with a clearer dream description")), 60000); // 60 second timeout
     });
+    
+    console.log("Calling Gemini API with model gemini-2.0-flash...");
     
     const analysisPromise = gemini.createChatCompletion({
       messages: [
@@ -171,11 +176,15 @@ async function analyzeDream(gemini: GeminiClient | null, dreamInput: DreamInput)
     // Race between the API call and timeout
     const response = await Promise.race([analysisPromise, timeoutPromise]) as any;
 
+    console.log("Gemini API Response:", JSON.stringify(response, null, 2));
+
     if (!response.choices?.[0]?.message?.content) {
       throw new Error("Invalid response from Gemini API");
     }
 
     const analysisContent = response.choices[0].message.content;
+    console.log("Analysis Content (first 500 chars):", analysisContent.substring(0, 500));
+    
     const parsed = JSON.parse(analysisContent);
     
     // Validate the response isn't just echoing gibberish

@@ -22,9 +22,9 @@ export class GeminiClient {
     response_format?: { type: string };
   }): Promise<ChatResponse> {
     try {
-      // Get the Gemini Pro model (using gemini-pro which is more widely available)
+      // Use Gemini 2.0 Flash - latest stable flash model
       const model = this.gemini.getGenerativeModel({ 
-        model: "gemini-pro",
+        model: "gemini-2.0-flash",
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 2000,
@@ -54,7 +54,15 @@ export class GeminiClient {
       // Generate content
       const result = await model.generateContent(prompt);
       const response = result.response;
-      const text = response.text();
+      let text = response.text();
+
+      // Extract JSON from markdown code blocks if present
+      if (text.includes('```json') || text.includes('```')) {
+        const jsonMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+        if (jsonMatch && jsonMatch[1]) {
+          text = jsonMatch[1].trim();
+        }
+      }
 
       return {
         choices: [

@@ -218,7 +218,16 @@ export default function DreamAnalyzer() {
   };
 
   const handleExportPDF = () => {
-    if (!analysisResult) return;
+    if (!analysisResult) {
+      toast({ 
+        title: 'No analysis available', 
+        description: 'Please analyze a dream first before exporting.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    console.log('Exporting PDF for analysis:', analysisResult);
     
     const created = new Date();
     
@@ -366,22 +375,26 @@ export default function DreamAnalyzer() {
 </body>
 </html>`;
 
-    const win = window.open('', '_blank', 'noopener,noreferrer');
+    const win = window.open('', '_blank', 'width=800,height=900');
     if (!win) {
       toast({ 
         title: 'Unable to open window', 
-        description: 'Please allow popups for this site.' 
+        description: 'Please allow popups for this site.',
+        variant: 'destructive'
       });
       return;
     }
+    
     win.document.open();
     win.document.write(htmlContent);
     win.document.close();
     
-    // Trigger print dialog for PDF export
-    setTimeout(() => {
-      win.print();
-    }, 250);
+    // Wait for content and images to load, then trigger print
+    win.onload = () => {
+      setTimeout(() => {
+        win.print();
+      }, 500);
+    };
     
     toast({
       title: "Report Ready",
