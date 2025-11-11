@@ -58,7 +58,7 @@ export default function Header({ showHistory, toggleHistory }: HeaderProps) {
           <div
             role="button"
             onClick={() => toggleHistory && toggleHistory()}
-            className="hidden md:flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-[var(--bg-hover)] transition-colors duration-150"
+            className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-[var(--bg-hover)] transition-colors duration-150"
             title={latest ? `Open recent analysis: ${latest.title || 'Untitled'}` : 'No recent analyses'}
           >
             {latest ? (
@@ -66,9 +66,9 @@ export default function Header({ showHistory, toggleHistory }: HeaderProps) {
                 <Badge className={`${getEmotionColor(latest.primaryEmotion)} rounded-md px-2 py-1 text-xs`}>{
                   latest.primaryEmotion.charAt(0).toUpperCase() + latest.primaryEmotion.slice(1)
                 }</Badge>
-                <div className="text-left">
-                  <div className="font-heading text-sm font-medium text-[var(--text-primary)]">
-                    {latest.title ? (latest.title.length > 28 ? latest.title.slice(0, 25) + '...' : latest.title) : 'Untitled Dream'}
+                <div className="text-left max-w-[160px] sm:max-w-[220px]">
+                  <div className="font-heading text-sm font-medium text-[var(--text-primary)] truncate">
+                    {latest.title ? latest.title : 'Untitled Dream'}
                   </div>
                   <div className="text-[var(--text-body)] text-xs">Most recent analysis</div>
                 </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,60 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { getEmotionIcon } from "@/lib/emotions";
+import { useToast } from "@/hooks/use-toast";
+
+// Component: ReflectionNotes — handles localStorage persistence for notes per dream
+function ReflectionNotes({ dreamId }: { dreamId: number }) {
+  const [notes, setNotes] = useState<string>("");
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    try {
+      const key = `dream_notes_${dreamId}`;
+      const saved = localStorage.getItem(key) || "";
+      setNotes(saved);
+      const savedMeta = localStorage.getItem(`${key}_meta`);
+      if (savedMeta) {
+        const meta = JSON.parse(savedMeta) as { savedAt?: number };
+        if (meta?.savedAt) setSavedAt(meta.savedAt);
+      }
+    } catch (err) {
+      // ignore localStorage errors
+    }
+  }, [dreamId]);
+
+  const saveNotes = () => {
+    try {
+      const key = `dream_notes_${dreamId}`;
+      localStorage.setItem(key, notes || "");
+      const meta = { savedAt: Date.now() };
+      localStorage.setItem(`${key}_meta`, JSON.stringify(meta));
+      setSavedAt(meta.savedAt);
+      toast({ title: "Reflection saved", description: "Your notes were saved locally." });
+    } catch (err) {
+      toast({ title: "Unable to save", description: "Could not save notes locally." });
+    }
+  };
+
+  return (
+    <div>
+      <h3 className="font-heading text-lg font-medium text-[var(--text-secondary)] mt-4 mb-2">Reflection Notes</h3>
+      <textarea
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        placeholder="Write your reflections, insights, or notes about this dream..."
+        className="w-full min-h-[110px] p-3 rounded-md bg-[var(--input-bg)] text-[var(--text-body)] border border-[var(--border-subtle)] focus:outline-none"
+      />
+      <div className="flex items-center justify-between mt-2">
+        <div className="text-xs text-[var(--text-body)]">{savedAt ? `Last saved ${new Date(savedAt).toLocaleString()}` : 'Not saved'}</div>
+        <div>
+          <Button variant="ghost" size="sm" onClick={saveNotes}>Save Notes</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
 import Trends from "./Trends";
 import { Dream } from "@shared/schema";
 
@@ -29,6 +83,8 @@ interface DreamHistoryProps {
 export default function DreamHistory({ showHistory, toggleHistory }: DreamHistoryProps) {
   const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const { toast } = useToast();
 
   const { data: dreams = [] as Dream[], isLoading } = useQuery<Dream[]>({
     queryKey: ['/api/dreams'],
@@ -78,16 +134,111 @@ export default function DreamHistory({ showHistory, toggleHistory }: DreamHistor
             <History className="mr-2 h-5 w-5 text-[var(--icon-primary)]" />
             Your Dream History
           </h2>
-          
-          <Button 
-            variant="ghost"
-            size="sm"
-            onClick={toggleHistory}
-            className="text-sm font-body text-[var(--text-secondary)] hover:text-[var(--text-accent)] flex items-center"
-          >
-            <EyeOff className="mr-1 h-4 w-4 text-[var(--icon-primary)]" />
-            Hide
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                // toggle history closed
+                toggleHistory();
+              }}
+              className="text-sm font-body text-[var(--text-secondary)] hover:text-[var(--text-accent)] flex items-center"
+            >
+              <EyeOff className="mr-1 h-4 w-4 text-[var(--icon-primary)]" />
+              Hide
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                // select all ids
+                const allIds = dreams.map(d => d.id);
+                setSelectedIds(allIds);
+                toast({ title: 'Selected all', description: `Selected ${allIds.length} dreams` });
+              }}
+            >
+              Select all
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSelectedIds([]);
+                toast({ title: 'Selection cleared' });
+              }}
+            >
+              Clear
+            </Button>
+
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => {
+                // export selected as combined printable HTML
+                if (!selectedIds || selectedIds.length === 0) {
+                  toast({ title: 'No dreams selected', description: 'Choose some dreams to export.' });
+                  return;
+                }
+
+                const selectedDreams = dreams.filter(d => selectedIds.includes(d.id));
+                const parts: string[] = [];
+                for (const sd of selectedDreams) {
+                  const created = sd.createdAt ? new Date(sd.createdAt as any) : new Date();
+                  let reflection = '';
+                  try {
+                    reflection = localStorage.getItem(`dream_notes_${sd.id}`) || '';
+                  } catch (e) {
+                    reflection = '';
+                  }
+
+                  const psychHtml = sd.psychologicalReport ? `
+                    <h3>Psychological Analysis</h3>
+                    <div>${(sd.psychologicalReport as any).analysisSummary ? ('<p>' + ((sd.psychologicalReport as any).analysisSummary as string).replace(/</g,'&lt;').replace(/\n\n/g, '</p><p>') + '</p>') : ''}</div>
+                  ` : '';
+
+                  const symbolsHtml = sd.psychologicalReport && (sd.psychologicalReport as any).keySymbols ? `
+                    <h4>Key Symbols</h4>
+                    <table><thead><tr><th>Symbol</th><th>Meaning</th></tr></thead><tbody>
+                      ${(sd.psychologicalReport as any).keySymbols.map((s: any) => (`<tr><td>${(s.symbol || '').replace(/</g,'&lt;')}</td><td>${(s.meaning || '').replace(/</g,'&lt;')}</td></tr>`)).join('')}
+                    </tbody></table>
+                  ` : '';
+
+                  const narrative = sd.dreamNarrative ? sd.dreamNarrative.replace(/</g,'&lt;').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>') : '<em>No narrative provided.</em>';
+
+                  const section = `
+                    <section style="page-break-after:always;margin-bottom:24px;">
+                      <h2>${sd.title ? sd.title.replace(/</g,'&lt;') : 'Untitled Dream'}</h2>
+                      <div style="color:#666;font-size:13px;margin-bottom:8px;">Analyzed ${format(created,'PPP p')} — Primary emotion: <strong>${sd.primaryEmotion || 'N/A'}</strong></div>
+                      <h3>Dream Narrative</h3>
+                      <div>${'<p>' + narrative + '</p>'}</div>
+                      ${psychHtml}
+                      ${symbolsHtml}
+                      <h3>Reflection Notes</h3>
+                      <div>${reflection ? ('<p>' + reflection.replace(/</g,'&lt;').replace(/\n\n/g,'</p><p>') + '</p>') : '<p><em>No reflection notes saved.</em></p>'}</div>
+                    </section>
+                  `;
+
+                  parts.push(section);
+                }
+
+                const full = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Dreams export</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial;color:#111;padding:24px}h1,h2,h3{margin:0 0 8px}section{margin-bottom:18px}</style></head><body><h1>Dreams Export</h1>${parts.join('\n')}</body></html>`;
+
+                const win = window.open('', '_blank', 'noopener,noreferrer');
+                if (!win) {
+                  toast({ title: 'Unable to open window', description: 'Please allow popups for this site.' });
+                  return;
+                }
+                win.document.open();
+                win.document.write(full);
+                win.document.close();
+                // let user print/save as PDF
+              }}
+            >
+              Export selected
+            </Button>
+          </div>
         </div>
   {/* Trends visualizations (emotions, symbols, activity) */}
   <Trends dreams={dreams} />
@@ -110,15 +261,30 @@ export default function DreamHistory({ showHistory, toggleHistory }: DreamHistor
               key={dream.id} 
               className="p-5 border-b border-[var(--border-subtle)] hover:bg-[var(--bg-hover)] transition-colors duration-200 flex flex-col sm:flex-row sm:items-center gap-4"
             >
-              <div className="flex-grow">
-                <h3 className="font-heading font-medium text-lg text-[var(--text-primary)]">
-                  {dream.title || "Untitled Dream"}
-                </h3>
-                <p className="font-body text-sm text-[var(--text-body)] mt-1">
-                  Analyzed {formatDate(new Date(dream.createdAt))}
-                </p>
+              <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.includes(dream.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedIds([...selectedIds, dream.id]);
+                    } else {
+                      setSelectedIds(selectedIds.filter(id => id !== dream.id));
+                    }
+                  }}
+                  className="mt-1"
+                  aria-label={`Select dream ${dream.title || 'untitled'}`}
+                />
+                <div className="flex-grow">
+                  <h3 className="font-heading font-medium text-lg text-[var(--text-primary)]">
+                    {dream.title || "Untitled Dream"}
+                  </h3>
+                  <p className="font-body text-sm text-[var(--text-body)] mt-1">
+                    Analyzed {formatDate(new Date(dream.createdAt))}
+                  </p>
+                </div>
               </div>
-              <div className="flex gap-2 sm:flex-shrink-0">
+              <div className="flex gap-2 sm:flex-shrink-0 items-center">
                 <Badge 
                   variant="secondary"
                   className={getEmotionColor(dream.primaryEmotion)}
@@ -175,18 +341,32 @@ export default function DreamHistory({ showHistory, toggleHistory }: DreamHistor
               </>
             )}
           </div>
-          
+          {/* Reflection notes area (client-side saved) */}
+          <div className="px-4 pb-4">
+            {selectedDream && (
+              <ReflectionNotes dreamId={selectedDream.id} />
+            )}
+          </div>
+
           <DrawerFooter>
             {/* Export / Print report for therapist */}
             <Button
               variant="ghost"
               onClick={() => {
-                if (!selectedDream) return;
-                const win = window.open("", "_blank", "noopener,noreferrer");
-                if (!win) return;
+                  if (!selectedDream) return;
+                  const win = window.open("", "_blank", "noopener,noreferrer");
+                  if (!win) return;
 
-                const created = selectedDream.createdAt ? new Date(selectedDream.createdAt as any) : new Date();
-                const reportHtml = `
+                  const created = selectedDream.createdAt ? new Date(selectedDream.createdAt as any) : new Date();
+                  // load reflection notes from localStorage (if any)
+                  let reflection = '';
+                  try {
+                    reflection = localStorage.getItem(`dream_notes_${selectedDream.id}`) || '';
+                  } catch (e) {
+                    reflection = '';
+                  }
+
+                  const reportHtml = `
                   <!doctype html>
                   <html>
                     <head>
@@ -240,11 +420,11 @@ export default function DreamHistory({ showHistory, toggleHistory }: DreamHistor
                         </div>
                       ` : ''}
 
-                      <!-- Reflection answers placeholder -->
+                      <!-- Reflection notes included from localStorage -->
                       <div class="section">
                         <h3>Reflection Notes</h3>
                         <div class="prose">
-                          <p><em>If you have reflection notes for this dream, include them here before printing.</em></p>
+                          ${reflection ? ('<p>' + reflection.replace(/</g,'&lt;').replace(/\n\n/g, '</p><p>') + '</p>') : '<p><em>No reflection notes saved.</em></p>'}
                         </div>
                       </div>
 

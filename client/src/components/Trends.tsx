@@ -16,6 +16,7 @@ import {
   CartesianGrid,
   Legend
 } from "recharts";
+import Timeline from "./Timeline";
 
 interface TrendsProps {
   dreams: Dream[];
@@ -125,6 +126,11 @@ export default function Trends({ dreams }: TrendsProps) {
             </LineChart>
           </ResponsiveContainer>
         </div>
+      </div>
+      
+      {/* Full-width activity calendar */}
+      <div className="col-span-1 lg:col-span-3">
+        <Timeline dreams={dreams} months={6} />
       </div>
     </div>
   );
